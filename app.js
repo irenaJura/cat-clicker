@@ -1,85 +1,128 @@
-var cats = ["img/mean.jpg", "img/please.jpg", "img/baby.jpg", "img/sleepy.jpg", "img/jump.jpg", "img/chill.jpg"];
+var model = {
 
-var names = ["Meany", "Miney", "Moe", "Teeny", "Tiny", "Toe"];
+	currentCat: null,
+	cats: [ {
+			imgSrc: "img/mean.jpg", 
+			name: "Meany",
+			clickCount: 0
+	}, 
+	{
+			imgSrc: "img/please.jpg", 
+			name: "Miney",
+			clickCount: 0
+	}, 
+	{
+			imgSrc: "img/baby.jpg", 
+			name: "Moe",
+			clickCount: 0
+	},
+	{
+			imgSrc: "img/sleepy.jpg", 
+			name: "Teeny",
+			clickCount: 0
+	},
+	{
+			imgSrc: "img/jump.jpg", 
+			name: "Tiney",
+			clickCount: 0
+	},
+	{
+			imgSrc: "img/chill.jpg", 
+			name: "Toe",
+			clickCount: 0
+	},
+	]
+	
+};
+
+var octopus = {
+
+	init: function() {
+		model.currentCat = model.cats[0];
+		catView.init();
+		catListView.init();
+	},
+
+	getCurrentCat: function() {
+		return model.currentCat;
+	},
+
+	getCats: function() {
+		return model.cats;
+	},
+
+	setCurrentCat: function(cat) {
+		model.currentCat = cat;
+	},
+
+	incrementCount: function() {
+		model.currentCat.clickCount++;
+		catView.render();
+	}
+	
+};
 
 
+var catView = {
 
-var spans = [
-				document.createElement('span'), document.createElement('span'), document.createElement('span'),
-				document.createElement('span'), document.createElement('span'), document.createElement('span')
-			];
+	init: function() {
 
-// Let's loop over the numbers in our array
-for (var i = 0; i < cats.length; i++) {
+		this.catElem = document.getElementById("cat");
+		this.catNameElem = document.getElementById("cat-name");
+		this.catCountElem = document.getElementById("cat-count");
+		this.catImageElem = document.getElementById("cat-img");
 
+		this.catImageElem.addEventListener('click', function() {
+			octopus.incrementCount();
+		});
 
-	 // This is the number we're on...
-	    var cat = cats[i];
-    	var name = names[i];
-    	var span = spans[i];
-    	
-	    // We're creating a DOM element for the number
-	    var box = document.createElement('div');
-	    box.setAttribute('class', 'box');
-	   
-    	var p = document.createElement('p');
-        p.textContent = name;
-	    
-	    var container = document.createElement('div');
-	   	container.setAttribute('class', 'container');
+		this.render();
+	},
 
-	    var img = document.createElement('img');
-	    img.src = cat;
-	    img.setAttribute('class', 'pics');
-	    
+	render: function() {
+		var currentCat = octopus.getCurrentCat();
 
-	    var txt = document.createElement('span');
-	    txt.setAttribute('class', 'txt');
-	    txt.textContent = "Number of clicks: "
-
-	    span.textContent = 0;
-
-	    img.addEventListener('click', (function(span) {
-		  let count = 0;
-
-		  return function() {
-		    count += 1;
-		    span.textContent = count;
-		  };
-		})(span));
-	    // ... and when we click, alert the value of `num`
-
-	    var imgDiv = document.querySelector('.images');
-
-	    imgDiv.appendChild(box);
-	    box.appendChild(p);
-	    box.appendChild(container);
-	    container.appendChild(img);
-	    container.appendChild(txt);
-	    container.appendChild(span);
+		this.catNameElem.textContent = currentCat.name;
+		this.catCountElem.textContent = currentCat.clickCount;
+		this.catImageElem.src = currentCat.imgSrc;
 	}
 
-	// var one = document.getElementById('one');
-	// var two = document.getElementById('two');
-	// var three = document.getElementById('three');
+};
 
 
-	// var meany = document.getElementById('Meany');
-	// var miney = document.getElementById('Miney');
-	// var moe = document.getElementById('Moe');
+var catListView = {
 
-	// var counter = 1;
-	// var counter1 = 1;
-	// var counter2 = 1;
+	init: function() {
+		this.catListElem = document.getElementById("cat-list");
 
-	// one.addEventListener('click', function() {
-	//     	meany.textContent = counter++;
-	// });
+		this.render();
+	},
 
-	// two.addEventListener('click', function() {
-	//     	miney.textContent = counter1++;
-	// });
+	render: function() {
+		var cat, elem, i;
+		var cats = octopus.getCats();
 
-	// three.addEventListener('click', function() {
-	//     	moe.textContent = counter2++; 
-	// });
+		this.catListElem.innerHTML = "";
+
+		for(i = 0; i < cats.length; i++) {
+			cat = cats[i]; 
+
+			elem = document.createElement("li");
+			elem.textContent = cat.name;
+
+			// closure-in-a-loop
+			elem.addEventListener('click', (function(catCopy) {
+				return function() {
+					octopus.setCurrentCat(catCopy);
+					catView.render();
+				};
+			})(cat));
+
+			this.catListElem.appendChild(elem);
+		}
+		
+	}
+
+};
+
+octopus.init();
